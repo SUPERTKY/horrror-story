@@ -42,4 +42,24 @@ dialog.showCurrent();
 document.getElementById("btnNext").addEventListener("click", () => dialog.next());
 document.getElementById("btnSkip").addEventListener("click", () => dialog.skip());
 document.getElementById("tapLayer").addEventListener("click", () => dialog.next());
+// ===== BGM（ステージ1） =====
+const bgm = document.getElementById("bgm");
+
+// 好みで調整
+bgm.volume = 0.6;
+
+// 再生を試みる（環境によってはブロックされる）
+bgm.play().catch(() => {
+  // ブロックされたら、最初の操作で鳴らす
+});
+
+// 最初のタップ/クリックで確実に鳴らす（どこ触ってもOK）
+const unlockBgm = () => {
+  bgm.play().catch(() => {});
+  document.removeEventListener("click", unlockBgm);
+  document.removeEventListener("touchstart", unlockBgm);
+};
+document.addEventListener("click", unlockBgm);
+document.addEventListener("touchstart", unlockBgm);
+
 
