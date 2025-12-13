@@ -19,7 +19,14 @@ const charElsById = {
   fanako: document.getElementById("char_fanako"),
 };
 
-const dialog = createDialogueSystem({ speakerEl, textEl, charElsById, speed: 22 });
+const dialog = createDialogueSystem({
+  dialogEl: document.getElementById("dialog"),
+  speakerEl,
+  textEl,
+  charElsById,
+  speed: 22,
+});
+
 dialog.load(STAGE1_DIALOGUE);
 dialog.showCurrent();
 
@@ -53,3 +60,4 @@ if (fade) {
   requestAnimationFrame(() => fade.classList.add("out"));
   fade.addEventListener("transitionend", () => fade.remove(), { once: true });
 }
+
