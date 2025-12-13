@@ -12,10 +12,11 @@
       margin: 0;
     }
 
-    body {
-      background: url("assets/bg_title.png") center / cover no-repeat;
-      overflow: hidden;
-    }
+body {
+  background: url("assets/bg_title.png") center / contain no-repeat;
+  background-color: #000; /* 余白対策 */
+}
+
 
     .screen {
       position: relative;
@@ -86,3 +87,4 @@
   </script>
 </body>
 </html>
+
