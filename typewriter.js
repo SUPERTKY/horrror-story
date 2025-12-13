@@ -2,19 +2,36 @@
 export function createDialogueSystem({
   speakerEl,
   textEl,
-  charElsById,     // { you: HTMLImageElement, guide: ..., shadow: ... }
-  speed = 22,      // 文字速度（小さいほど速い）
+  charElsById,     // { atsushi: el, shusuke: el, fanako: el }
+  speed = 22,
 }) {
   let lines = [];
   let index = 0;
 
   let typing = false;
-  let cancel = false; // trueなら今の行を全文表示
+  let cancel = false;
+
+  // ★初登場したキャラだけ表示する
+  const appeared = new Set();
 
   function setActiveSpeaker(speakerId){
-    // 全キャラを暗くして、話しているキャラだけ明るくする
+    // speakerId がある＝そのキャラが喋る → 初登場扱いにする
+    if (speakerId && charElsById[speakerId]) {
+      appeared.add(speakerId);
+      charElsById[speakerId].classList.remove("hidden");
+    }
+
     Object.entries(charElsById).forEach(([id, el]) => {
       if (!el) return;
+
+      // 初登場前は完全に「いない」
+      if (!appeared.has(id)) {
+        el.classList.add("hidden");
+        el.classList.remove("active");
+        return;
+      }
+
+      // 登場済みなら、喋ってるキャラだけ明るく
       el.classList.toggle("active", id === speakerId);
     });
   }
@@ -53,25 +70,15 @@ export function createDialogueSystem({
   async function next(){
     if (!lines.length) return;
 
-    // タイピング中なら「全文表示」に切り替え
-    if (typing) {
-      cancel = true;
-      return;
-    }
+    // タイピング中なら全文表示
+    if (typing) { cancel = true; return; }
 
-    // 次の行へ
     index++;
     if (index >= lines.length) {
-      // 終了：最後はそのまま止める（次ステージに繋げたいならここを改造）
       index = lines.length - 1;
       return;
     }
     await showCurrent();
-  }
-
-  function skip(){
-    // 押すと今の行を一気に表示
-    cancel = true;
   }
 
   function load(newLines){
@@ -79,5 +86,5 @@ export function createDialogueSystem({
     index = 0;
   }
 
-  return { load, showCurrent, next, skip };
+  return { load, showCurrent, next };
 }
