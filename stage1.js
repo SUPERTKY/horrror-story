@@ -61,5 +61,12 @@ const unlockBgm = () => {
 };
 document.addEventListener("click", unlockBgm);
 document.addEventListener("touchstart", unlockBgm);
+// ===== フェードアウト開始 =====
+const fade = document.getElementById("fade");
+// 1フレーム待ってから out を付ける（確実にアニメする）
+requestAnimationFrame(() => fade.classList.add("out"));
+// 完全に消えたらDOMから外す（任意）
+fade.addEventListener("transitionend", () => fade.remove(), { once: true });
+
 
 
