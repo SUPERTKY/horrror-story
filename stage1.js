@@ -8,12 +8,13 @@ import { createDialogueSystem } from "./typewriter.js";
  * - text（セリフ）
  */
 const STAGE1_DIALOGUE = [
-  { speaker: "あなた", speakerId: "you", text: "……霧が濃い。\n森の匂いが、近すぎる。" },
-  { speaker: "あなた", speakerId: "you", text: "さっきまであった道が、消えてる。" },
-  { speaker: "？？？", speakerId: "guide", text: "戻らないほうがいい。" },
-  { speaker: "あなた", speakerId: "you", text: "……誰？" },
-  { speaker: "？？？", speakerId: "shadow", text: "数えるな。" }
+  { speaker: "熱史", speakerId: "atsushi", text: "……霧が濃いな。\nここ、本当に森か？" },
+  { speaker: "秋介", speakerId: "shusuke", text: "熱史、足元見ろ。\n……足跡が、変だ。" },
+  { speaker: "ふぁなこ", speakerId: "fanako", text: "ねえ……。\n今、誰か数えた？" },
+  { speaker: "熱史", speakerId: "atsushi", text: "……数える？\n何をだよ。" },
+  { speaker: "ふぁなこ", speakerId: "fanako", text: "……ううん。\n数えないで。" }
 ];
+
 
 // 画面の要素を拾う
 const speakerEl = document.getElementById("speaker");
@@ -21,9 +22,9 @@ const textEl = document.getElementById("text");
 
 // キャラ画像（IDは game.html の img id に合わせる）
 const charElsById = {
-  you: document.getElementById("char_you"),
-  guide: document.getElementById("char_guide"),
-  shadow: document.getElementById("char_shadow"),
+  atsushi: document.getElementById("char_atsushi"),
+  shusuke: document.getElementById("char_shusuke"),
+  fanako: document.getElementById("char_fanako"),
 };
 
 const dialog = createDialogueSystem({
@@ -41,3 +42,4 @@ dialog.showCurrent();
 document.getElementById("btnNext").addEventListener("click", () => dialog.next());
 document.getElementById("btnSkip").addEventListener("click", () => dialog.skip());
 document.getElementById("tapLayer").addEventListener("click", () => dialog.next());
+
