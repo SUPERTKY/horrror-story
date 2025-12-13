@@ -1,12 +1,6 @@
 // stage1.js
 import { createDialogueSystem } from "./typewriter.js";
 
-/**
- * 編集するのはここだけでOK：
- * - speaker（表示名）
- * - speakerId（どのキャラが話してるか：you / guide / shadow）
- * - text（セリフ）
- */
 const STAGE1_DIALOGUE = [
   { speaker: "熱史", speakerId: "atsushi", text: "……霧が濃いな。\nここ、本当に森か？" },
   { speaker: "秋介", speakerId: "shusuke", text: "熱史、足元見ろ。\n……足跡が、変だ。" },
@@ -15,58 +9,47 @@ const STAGE1_DIALOGUE = [
   { speaker: "ふぁなこ", speakerId: "fanako", text: "……ううん。\n数えないで。" }
 ];
 
-
-// 画面の要素を拾う
+// 要素
 const speakerEl = document.getElementById("speaker");
 const textEl = document.getElementById("text");
 
-// キャラ画像（IDは game.html の img id に合わせる）
 const charElsById = {
   atsushi: document.getElementById("char_atsushi"),
   shusuke: document.getElementById("char_shusuke"),
   fanako: document.getElementById("char_fanako"),
 };
 
-const dialog = createDialogueSystem({
-  speakerEl,
-  textEl,
-  charElsById,
-  speed: 22, // 速さ（数字を小さくすると速い）
-});
-
-// データ読み込み＆開始
+const dialog = createDialogueSystem({ speakerEl, textEl, charElsById, speed: 22 });
 dialog.load(STAGE1_DIALOGUE);
 dialog.showCurrent();
 
-// 操作：ボタン＆画面タップで進む
-document.getElementById("btnNext").addEventListener("click", () => dialog.next());
-document.getElementById("btnSkip").addEventListener("click", () => dialog.skip());
-document.getElementById("tapLayer").addEventListener("click", () => dialog.next());
-// ===== BGM（ステージ1） =====
+// タップで進む（存在チェックつき）
+const tapLayer = document.getElementById("tapLayer");
+if (tapLayer) {
+  tapLayer.addEventListener("click", () => dialog.next());
+}
+
+// ===== BGM（ステージ1）=====
 const bgm = document.getElementById("bgm");
+if (bgm) {
+  bgm.volume = 0.6;
 
-// 好みで調整
-bgm.volume = 0.6;
-
-// 再生を試みる（環境によってはブロックされる）
-bgm.play().catch(() => {
-  // ブロックされたら、最初の操作で鳴らす
-});
-
-// 最初のタップ/クリックで確実に鳴らす（どこ触ってもOK）
-const unlockBgm = () => {
+  // まず再生を試す（ブロックされることはある）
   bgm.play().catch(() => {});
-  document.removeEventListener("click", unlockBgm);
-  document.removeEventListener("touchstart", unlockBgm);
-};
-document.addEventListener("click", unlockBgm);
-document.addEventListener("touchstart", unlockBgm);
+
+  // 最初の操作で確実に鳴らす
+  const unlockBgm = () => {
+    bgm.play().catch(() => {});
+    document.removeEventListener("click", unlockBgm);
+    document.removeEventListener("touchstart", unlockBgm);
+  };
+  document.addEventListener("click", unlockBgm);
+  document.addEventListener("touchstart", unlockBgm);
+}
+
 // ===== フェードアウト開始 =====
 const fade = document.getElementById("fade");
-// 1フレーム待ってから out を付ける（確実にアニメする）
-requestAnimationFrame(() => fade.classList.add("out"));
-// 完全に消えたらDOMから外す（任意）
-fade.addEventListener("transitionend", () => fade.remove(), { once: true });
-
-
-
+if (fade) {
+  requestAnimationFrame(() => fade.classList.add("out"));
+  fade.addEventListener("transitionend", () => fade.remove(), { once: true });
+}
