@@ -2,12 +2,23 @@
 import { createDialogueSystem } from "./typewriter.js";
 
 const STAGE1_DIALOGUE = [
-  { speaker: "熱史", speakerId: "atsushi", text: "……霧が濃いな。\nここ、本当に森か？" },
-  { speaker: "秋介", speakerId: "shusuke", text: "熱史、足元見ろ。\n……足跡が、変だ。" },
-  { speaker: "ふぁなこ", speakerId: "fanako", text: "ねえ……。\n今、誰か数えた？" },
-  { speaker: "熱史", speakerId: "atsushi", text: "……数える？\n何をだよ。" },
-  { speaker: "ふぁなこ", speakerId: "fanako", text: "……ううん。\n数えないで。" }
+  { speaker:"熱史", speakerId:"atsushi", text:"……霧が濃いな。", tone:"cold" },
+
+  { speaker:"秋介", speakerId:"shusuke",
+    text:"熱史、足元見ろ。[pause:500]\n……足跡が、変だ。",
+    tone:"whisper", speed: 26
+  },
+
+  { speaker:"ふぁなこ", speakerId:"fanako",
+    text:"ねえ……。[pause:700]\n今、誰か数えた？",
+    tone:"whisper", fx:"glitch"
+  },
+
+  { speaker:"熱史", speakerId:"atsushi",
+    text:"やめろ！", tone:"shout", fx:"shake", speed: 16
+  },
 ];
+
 
 // 要素
 const speakerEl = document.getElementById("speaker");
@@ -60,4 +71,5 @@ if (fade) {
   requestAnimationFrame(() => fade.classList.add("out"));
   fade.addEventListener("transitionend", () => fade.remove(), { once: true });
 }
+
 
