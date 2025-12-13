@@ -25,25 +25,36 @@
     }
 
     /* キャラ表示（下に並べる） */
-    .chars{
-      position:absolute; left:0; right:0; bottom:120px;
-      display:flex; justify-content:center; align-items:flex-end;
-      gap: 18px;
-      padding: 0 14px;
-      pointer-events:none;
-    }
-    .char{
-      width: min(28vw, 220px);
-      max-width: 240px;
-      opacity: var(--dim);
-      filter: brightness(.75);
-      transition: opacity .15s linear, filter .15s linear, transform .15s linear;
-    }
-    .char.active{
-      opacity: 1;
-      filter: none;
-      transform: translateY(-2px);
-    }
+/* キャラ表示：右下固定・下端ぴったり */
+.chars{
+  position: absolute;
+  right: 16px;
+  bottom: 0;                 /* ← 下にピッタリ */
+  display: flex;
+  align-items: flex-end;     /* ← 切れ端防止の最重要ポイント */
+  gap: 14px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* キャラ画像 */
+.char{
+  height: min(46vh, 360px);  /* 高さ基準（ここでサイズ調整） */
+  width: auto;
+  object-fit: contain;
+
+  opacity: var(--dim);
+  filter: brightness(.75);
+  transition: opacity .15s linear, filter .15s linear, transform .15s linear;
+}
+
+/* 発言中キャラ */
+.char.active{
+  opacity: 1;
+  filter: none;
+  transform: translateY(-2px);
+}
+
 
     /* 会話ボックス */
     .dialog{
@@ -126,5 +137,6 @@
   <script type="module" src="stage1.js"></script>
 </body>
 </html>
+
 
 
