@@ -69,21 +69,29 @@ body {
   </div>
 
   <script>
-    const bgm = document.getElementById("bgm");
+  const bgm = document.getElementById("bgm");
+  const startBtn = document.getElementById("startBtn");
 
-    // 初回操作でミュート解除（どこを触ってもOK）
-    const unlock = () => {
-      bgm.muted = false;
-      bgm.volume = 0.6;
-      bgm.play();
-      document.removeEventListener("click", unlock);
-      document.removeEventListener("touchstart", unlock);
-    };
+  // 初回操作でミュート解除（自動再生対策）
+  const unlock = () => {
+    bgm.muted = false;
+    bgm.volume = 0.6;
+    bgm.play();
+    document.removeEventListener("click", unlock);
+    document.removeEventListener("touchstart", unlock);
+  };
 
-    document.addEventListener("click", unlock);
-    document.addEventListener("touchstart", unlock);
-  </script>
+  document.addEventListener("click", unlock);
+  document.addEventListener("touchstart", unlock);
+
+  // スタートボタンを押したら game.html へ
+  startBtn.addEventListener("click", () => {
+    window.location.href = "game.html";
+  });
+</script>
+
 </body>
 </html>
+
 
 
