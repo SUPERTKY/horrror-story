@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>霧の森 - Stage</title>
+  <style>
+    :root{
+      --text: #f2f2f2;
+      --panel: rgba(0,0,0,.70);
+      --line: rgba(255,255,255,.18);
+      --dim: 0.35; /* 発言してないキャラの暗さ */
+    }
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; margin:0; background:#000; font-family:system-ui,sans-serif; color:var(--text); }
+
+    .app{ position:relative; height:100%; overflow:hidden; }
+
+    /* 背景 */
+    .bg{
+      position:absolute; inset:0;
+      background: url("assets/bg_stage1.png") center / cover no-repeat;
+      filter: brightness(.78) contrast(1.05);
+      transform: scale(1.02);
+    }
+
+    /* キャラ表示（下に並べる） */
+    .chars{
+      position:absolute; left:0; right:0; bottom:120px;
+      display:flex; justify-content:center; align-items:flex-end;
+      gap: 18px;
+      padding: 0 14px;
+      pointer-events:none;
+    }
+    .char{
+      width: min(28vw, 220px);
+      max-width: 240px;
+      opacity: var(--dim);
+      filter: brightness(.75);
+      transition: opacity .15s linear, filter .15s linear, transform .15s linear;
+    }
+    .char.active{
+      opacity: 1;
+      filter: none;
+      transform: translateY(-2px);
+    }
+
+    /* 会話ボックス */
+    .dialog{
+      position:absolute; left:0; right:0; bottom:0;
+      background: var(--panel);
+      border-top: 1px solid var(--line);
+      padding: 12px 14px 14px;
+      min-height: 120px;
+    }
+    .toprow{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      margin-bottom: 8px;
+    }
+    .speaker{ font-weight:700; letter-spacing:.06em; }
+    .hint{ font-size:.85rem; opacity:.75; }
+
+    .text{
+      line-height:1.85;
+      white-space: pre-wrap;
+      min-height: 3.6em;
+      user-select:none;
+    }
+
+    .controls{
+      margin-top: 10px;
+      display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap;
+    }
+    button{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 9px 12px;
+      cursor:pointer;
+    }
+    button:hover{ background: rgba(255,255,255,.10); }
+
+    /* 画面タップで進める用（邪魔しない透明レイヤー） */
+    .tapLayer{
+      position:absolute; inset:0;
+      background: transparent;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <div id="bg" class="bg" aria-hidden="true"></div>
+
+    <!-- キャラ（画像差し替えOK） -->
+    <div class="chars" aria-hidden="true">
+      <img id="char_you" class="char" src="assets/char_you.png" alt="">
+      <img id="char_guide" class="char" src="assets/char_guide.png" alt="">
+      <img id="char_shadow" class="char" src="assets/char_shadow.png" alt="">
+    </div>
+
+    <!-- 会話 -->
+    <section class="dialog" aria-label="会話">
+      <div class="toprow">
+        <div id="speaker" class="speaker">—</div>
+        <div class="hint">タップで進む / スキップで速く</div>
+      </div>
+
+      <div id="text" class="text"></div>
+
+      <div class="controls">
+        <button id="btnSkip" type="button">スキップ</button>
+        <button id="btnNext" type="button">次へ</button>
+      </div>
+    </section>
+
+    <!-- 画面タップで進める -->
+    <div id="tapLayer" class="tapLayer" aria-hidden="true"></div>
+  </div>
+
+  <!-- ステージ1を読み込む -->
+  <script type="module" src="stage1.js"></script>
+</body>
+</html>
