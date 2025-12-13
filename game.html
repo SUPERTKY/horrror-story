@@ -114,6 +114,34 @@
   visibility: hidden;
   transform: translateY(6px);
 }
+/* ===== トーン（言葉の強さ） ===== */
+.dialog.tone-whisper .text { opacity: .72; }
+.dialog.tone-whisper .speaker { opacity: .8; }
+
+.dialog.tone-shout .text { font-size: 1.12em; letter-spacing: .03em; }
+.dialog.tone-shout .speaker { filter: brightness(1.1); }
+
+.dialog.tone-cold .text { opacity: .88; }
+.dialog.tone-cold .text { text-shadow: 0 0 10px rgba(255,255,255,.12); }
+
+/* ===== FX（視覚エフェクト） ===== */
+@keyframes shakeTiny {
+  0% { transform: translate(0,0); }
+  25% { transform: translate(1px,0); }
+  50% { transform: translate(-1px,1px); }
+  75% { transform: translate(0,-1px); }
+  100% { transform: translate(0,0); }
+}
+.dialog.fx-shake .text {
+  animation: shakeTiny .12s infinite;
+}
+
+.dialog.fx-glitch .text{
+  text-shadow:
+    1px 0 rgba(255,0,0,.25),
+   -1px 0 rgba(0,200,255,.20),
+    0 0 10px rgba(255,255,255,.12);
+}
 
   </style>
 </head>
@@ -136,7 +164,8 @@
 
 
     <!-- 会話 -->
-    <section class="dialog" aria-label="会話">
+    <section id="dialog" class="dialog" aria-label="会話">
+
       <div class="toprow">
         <div id="speaker" class="speaker">—</div>
         
@@ -156,6 +185,7 @@
   <script type="module" src="stage1.js"></script>
 </body>
 </html>
+
 
 
 
