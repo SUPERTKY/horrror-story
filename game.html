@@ -97,6 +97,24 @@
       position:absolute; inset:0;
       background: transparent;
     }
+    .fade{
+  position:absolute;
+  inset:0;
+  background:#000;
+  opacity: 1;
+  transition: opacity 900ms ease;
+  z-index: 999; /* 一番上 */
+  pointer-events:none;
+}
+.fade.out{
+  opacity: 0;
+}
+.char.hidden{
+  opacity: 0 !important;
+  visibility: hidden;
+  transform: translateY(6px);
+}
+
   </style>
 </head>
 
@@ -138,6 +156,7 @@
   <script type="module" src="stage1.js"></script>
 </body>
 </html>
+
 
 
 
