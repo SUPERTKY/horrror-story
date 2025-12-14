@@ -125,13 +125,25 @@ const charElsById = {
   fanako: document.getElementById("char_fanako"),
 };
 
+const bgm = document.getElementById("bgm");
+const sfx = document.getElementById("sfx");
+const overlayEl = document.getElementById("overlay");
+const overlayImgEl = document.getElementById("overlayImg");
+
 const dialog = createDialogueSystem({
   dialogEl: document.getElementById("dialog"),
   speakerEl,
   textEl,
   charElsById,
   speed: 22,
+
+  // ★追加
+  bgmEl: bgm,
+  sfxEl: sfx,
+  overlayEl,
+  overlayImgEl,
 });
+
 
 dialog.load(STAGE1_DIALOGUE);
 dialog.showCurrent();
@@ -166,6 +178,7 @@ if (fade) {
   requestAnimationFrame(() => fade.classList.add("out"));
   fade.addEventListener("transitionend", () => fade.remove(), { once: true });
 }
+
 
 
 
