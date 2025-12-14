@@ -162,14 +162,12 @@ if (tapLayer) {
 }
 
 // ===== BGM（ステージ1）=====
-const bgm = document.getElementById("bgm");
+// ===== BGM（ステージ1）=====
 if (bgm) {
   bgm.volume = 0.6;
 
-  // まず再生を試す（ブロックされることはある）
   bgm.play().catch(() => {});
 
-  // 最初の操作で確実に鳴らす
   const unlockBgm = () => {
     bgm.play().catch(() => {});
     document.removeEventListener("click", unlockBgm);
@@ -179,12 +177,14 @@ if (bgm) {
   document.addEventListener("touchstart", unlockBgm);
 }
 
+
 // ===== フェードアウト開始 =====
 const fade = document.getElementById("fade");
 if (fade) {
   requestAnimationFrame(() => fade.classList.add("out"));
   fade.addEventListener("transitionend", () => fade.remove(), { once: true });
 }
+
 
 
 
