@@ -1,9 +1,9 @@
 // typewriter.js
 export function createDialogueSystem({
-  dialogEl,        // ★追加：dialog全体（classを付ける）
+  dialogEl,
   speakerEl,
-  textEl,
-  charElsById,     // { atsushi: el, shusuke: el, fanako: el }
+  textEl,        // ★コンテナ (#text)
+  charElsById,
   speed = 22,
 }) {
   let lines = [];
@@ -14,11 +14,20 @@ export function createDialogueSystem({
 
   const appeared = new Set();
 
-  function setActiveSpeaker(speakerId){
-    if (speakerId && charElsById[speakerId]) {
-      appeared.add(speakerId);
-      charElsById[speakerId].classList.remove("hidden");
-    }
+  // ★2段対応：中の要素を拾う（無ければフォールバック）
+  const textAEl = textEl?.querySelector?.("#textA") ?? textEl;
+  const textBEl = textEl?.querySelector?.("#textB") ?? null;
+
+  function setActiveSpeakers(speakerIds){
+    const ids = (Array.isArray(speakerIds) ? speakerIds : [speakerIds]).filter(Boolean);
+
+    // 立ち絵が存在するidだけ出す
+    ids.forEach(id => {
+      if (charElsById[id]) {
+        appeared.add(id);
+        charElsById[id].classList.remove("hidden");
+      }
+    });
 
     Object.entries(charElsById).forEach(([id, el]) => {
       if (!el) return;
@@ -28,45 +37,44 @@ export function createDialogueSystem({
         el.classList.remove("active");
         return;
       }
-      el.classList.toggle("active", id === speakerId);
+
+      // ★同時発話なら2人ともactive
+      el.classList.toggle("active", ids.includes(id));
     });
   }
 
   function applyLineStyle(line){
     if (!dialogEl) return;
-
-    // まず既存の tone/fx を外す
     dialogEl.classList.remove(
       "tone-whisper","tone-shout","tone-cold",
       "fx-shake","fx-glitch"
     );
-
     if (line.tone) dialogEl.classList.add(`tone-${line.tone}`);
     if (line.fx) dialogEl.classList.add(`fx-${line.fx}`);
   }
 
   function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
 
-  // ★文章内コマンド：[pause:500] を消費して止める
-  async function typeTextWithCommands(rawText, baseDelay){
-    textEl.textContent = "";
+  async function typeTextWithCommands(targetEl, rawText, baseDelay){
+    if (!targetEl) return;
+    targetEl.textContent = "";
+
     for (let i = 0; i < rawText.length; i++){
       if (cancel) break;
 
-      // [pause:xxx] 判定
       if (rawText.startsWith("[pause:", i)) {
         const end = rawText.indexOf("]", i);
         if (end !== -1) {
           const num = rawText.slice(i + 7, end);
           const ms = Math.max(0, parseInt(num, 10) || 0);
           await sleep(ms);
-          i = end; // ] まで読み飛ばす
+          i = end;
           continue;
         }
       }
 
       const c = rawText[i];
-      textEl.textContent += c;
+      targetEl.textContent += c;
 
       let d = baseDelay;
       if ("。！？".includes(c)) d += 90;
@@ -75,8 +83,7 @@ export function createDialogueSystem({
     }
 
     if (cancel) {
-      // コマンドは取り除いて全文表示
-      textEl.textContent = rawText.replace(/\[pause:\d+\]/g, "");
+      targetEl.textContent = rawText.replace(/\[pause:\d+\]/g, "");
     }
   }
 
@@ -84,12 +91,38 @@ export function createDialogueSystem({
     typing = true;
     cancel = false;
 
-    speakerEl.textContent = line.speaker ?? "—";
-    setActiveSpeaker(line.speakerId);
     applyLineStyle(line);
 
-    const lineSpeed = line.speed ?? speed;
-    await typeTextWithCommands(line.text ?? "", lineSpeed);
+    // ★2人同時発話 or 1人発話 判定
+    const isDual = Array.isArray(line.speakers) && Array.isArray(line.texts);
+
+    if (isDual) {
+      const a = line.speakers[0] ?? {};
+      const b = line.speakers[1] ?? {};
+
+      // 表示名：2人まとめて
+      speakerEl.textContent = `${a.speaker ?? "—"}＆${b.speaker ?? "—"}`;
+
+      // 立ち絵：2人分active（ゲストはspeakerId nullでOK）
+      setActiveSpeakers([a.speakerId, b.speakerId]);
+
+      const lineSpeed = line.speed ?? speed;
+
+      // ★同時にタイプ（Promise.all）
+      await Promise.all([
+        typeTextWithCommands(textAEl, line.texts[0] ?? "", lineSpeed),
+        typeTextWithCommands(textBEl, line.texts[1] ?? "", lineSpeed),
+      ]);
+
+    } else {
+      // 1人発話（従来互換）
+      speakerEl.textContent = line.speaker ?? "—";
+      setActiveSpeakers(line.speakerId ?? null);
+
+      const lineSpeed = line.speed ?? speed;
+      await typeTextWithCommands(textAEl, line.text ?? "", lineSpeed);
+      if (textBEl) textBEl.textContent = ""; // ★2段目は消す
+    }
 
     typing = false;
     await sleep(180);
@@ -102,7 +135,6 @@ export function createDialogueSystem({
 
   async function next(){
     if (!lines.length) return;
-
     if (typing) { cancel = true; return; }
 
     index++;
