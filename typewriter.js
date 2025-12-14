@@ -109,18 +109,18 @@ export function createDialogueSystem({
   }
 
   // ★ここで「セリフ開始時に発動する効果」をまとめて実行
-  async function runLineEffects(line){
-    if (!line) return;
+async function runLineEffects(line){
+  if (!line) return;
 
-    // 例：line.sfx = { src:"assets/sfx_click.mp3", volume:0.8 }
-    if (line.sfx?.src) playSfx(line.sfx.src, line.sfx);
+  if (line.sfx?.src) playSfx(line.sfx.src, line.sfx);
 
-    // 例：line.cut = { src:"assets/stinger.mp3", volume:0.9 } // BGM中断して鳴る
-    if (line.cut?.src) await playInterruptAudio(line.cut.src, line.cut);
+  // ★ここ：await を外す
+  if (line.cut?.src) playInterruptAudio(line.cut.src, line.cut);
 
-    // 例：line.image = { src:"assets/mark.png", ms:900 }
-    if (line.image?.src) await showOverlayImage(line.image.src, line.image);
-  }
+  // ★ここ：await を外す
+  if (line.image?.src) showOverlayImage(line.image.src, line.image);
+}
+
 
   async function typeTextWithCommands(targetEl, rawText, baseDelay){
     if (!targetEl) return;
@@ -154,42 +154,47 @@ export function createDialogueSystem({
     }
   }
 
-  async function typeLine(line){
-    typing = true;
-    cancel = false;
+async function typeLine(line){
+  typing = true;
+  cancel = false;
 
-    applyLineStyle(line);
+  applyLineStyle(line);
 
-    // ★追加：セリフ開始時の効果
-    await runLineEffects(line);
+  // ★ここで先に表示名と立ち絵を確定（効果より先）
+  const isDual = Array.isArray(line.speakers) && Array.isArray(line.texts);
 
-    const isDual = Array.isArray(line.speakers) && Array.isArray(line.texts);
-
-    if (isDual) {
-      const a = line.speakers[0] ?? {};
-      const b = line.speakers[1] ?? {};
-
-      speakerEl.textContent = `${a.speaker ?? "—"}＆${b.speaker ?? "—"}`;
-      setActiveSpeakers([a.speakerId, b.speakerId]);
-
-      const lineSpeed = line.speed ?? speed;
-      await Promise.all([
-        typeTextWithCommands(textAEl, line.texts[0] ?? "", lineSpeed),
-        typeTextWithCommands(textBEl, line.texts[1] ?? "", lineSpeed),
-      ]);
-
-    } else {
-      speakerEl.textContent = line.speaker ?? "—";
-      setActiveSpeakers(line.speakerId ?? null);
-
-      const lineSpeed = line.speed ?? speed;
-      await typeTextWithCommands(textAEl, line.text ?? "", lineSpeed);
-      if (textBEl) textBEl.textContent = "";
-    }
-
-    typing = false;
-    await sleep(180);
+  if (isDual) {
+    const a = line.speakers[0] ?? {};
+    const b = line.speakers[1] ?? {};
+    speakerEl.textContent = `${a.speaker ?? "—"}＆${b.speaker ?? "—"}`;
+    setActiveSpeakers([a.speakerId, b.speakerId]);
+  } else {
+    speakerEl.textContent = line.speaker ?? "—";
+    setActiveSpeakers(line.speakerId ?? null);
   }
+
+  // ★ここが超重要：テキスト欄を「同期で」先に空にする（残像対策）
+  if (textAEl) textAEl.textContent = "";
+  if (textBEl) textBEl.textContent = "";
+
+  // ★効果は “待たずに” 発火（セリフ表示と同時に）
+  runLineEffects(line); // ← await しない
+
+  const lineSpeed = line.speed ?? speed;
+
+  if (isDual) {
+    await Promise.all([
+      typeTextWithCommands(textAEl, line.texts[0] ?? "", lineSpeed),
+      typeTextWithCommands(textBEl, line.texts[1] ?? "", lineSpeed),
+    ]);
+  } else {
+    await typeTextWithCommands(textAEl, line.text ?? "", lineSpeed);
+  }
+
+  typing = false;
+  await sleep(180);
+}
+
 
   async function showCurrent(){
     if (!lines.length) return;
@@ -215,3 +220,4 @@ export function createDialogueSystem({
 
   return { load, showCurrent, next };
 }
+
