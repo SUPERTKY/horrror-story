@@ -2,20 +2,8 @@
 import { createDialogueSystem } from "./typewriter.js";
 
 // stage1.js（STAGE1_DIALOGUEだけ差し替え）
+// stage1.js
 const STAGE1_DIALOGUE = [
-  { speaker:"熱史", speakerId:"atsushi", text:"……霧が濃いな。", tone:"cold" },
-
-  { speaker:"秋介", speakerId:"shusuke",
-    text:"熱史、足元見ろ。[pause:500]\n……足跡が、変だ。",
-    tone:"whisper", speed: 26
-  },
-
-  { speaker:"ふぁなこ", speakerId:"fanako",
-    text:"ねえ……。[pause:700]\n今、誰か数えた？",
-    tone:"whisper", fx:"glitch"
-  },
-
-  // ===== ここから：導入シナリオを当てはめ =====
   { speaker:"熱史", speakerId:"atsushi",
     text:"俺、ミュージシャンになりたいんだ。",
     tone:"cold"
@@ -43,10 +31,10 @@ const STAGE1_DIALOGUE = [
 
   { speaker:"熱史", speakerId:"atsushi",
     text:"3カ月前に亡くなった天才ミュージシャン！\n田中たけしさんだ！",
-    tone:"shout", fx:"shake", speed: 16
+    tone:"shout", fx:"shake", speed:16
   },
 
-  // ★同時しゃべり（typewriter.js拡張版を入れている前提）
+  // ★ 同時しゃべり
   {
     speakers: [
       { speaker:"秋介", speakerId:"shusuke" },
@@ -60,7 +48,7 @@ const STAGE1_DIALOGUE = [
   },
 
   { speaker:"秋介", speakerId:"shusuke",
-    text:"おいふぁなこ、熱史…やばいことしようとしてないか？",
+    text:"おいふぁなこ、熱史……やばいことしようとしてないか？",
     tone:"whisper"
   },
 
@@ -70,11 +58,11 @@ const STAGE1_DIALOGUE = [
   },
 
   { speaker:"熱史", speakerId:"atsushi",
-    text:"そこで、彼が亡くなっていた森に行って、アドバイスもらおうと思う。",
+    text:"そこで、彼が亡くなっていた森に行って、アドバイスをもらおうと思う。",
     tone:"cold"
   },
 
-  // ★同時しゃべり：脱力の「あぁ…」
+  // ★ 同時しゃべり（脱力）
   {
     speakers: [
       { speaker:"秋介", speakerId:"shusuke" },
@@ -88,11 +76,11 @@ const STAGE1_DIALOGUE = [
   },
 
   { speaker:"熱史", speakerId:"atsushi",
-    text:"そこで、一人だとなんか怖いので、君たちに来てもらう。",
+    text:"一人だとなんか怖いので、君たちにも来てもらう。",
     tone:"cold"
   },
 
-  // ★同時しゃべり：あぁ……は！？
+  // ★ 同時しゃべり（拒否反応）
   {
     speakers: [
       { speaker:"秋介", speakerId:"shusuke" },
@@ -107,10 +95,10 @@ const STAGE1_DIALOGUE = [
 
   { speaker:"熱史", speakerId:"atsushi",
     text:"では、今夜さっそく森に行く。[pause:250]\n準備しといてくれ！",
-    tone:"shout", speed: 18
+    tone:"shout", speed:18
   },
 
-  // ★同時しゃべり：止めに入る
+  // ★ 同時しゃべり（ラスト）
   {
     speakers: [
       { speaker:"ふぁなこ", speakerId:"fanako" },
@@ -118,17 +106,12 @@ const STAGE1_DIALOGUE = [
     ],
     texts: [
       "ちょっ！まっ！",
-      "なんてこった…。",
+      "なんてこった……。",
     ],
     tone:"shout"
   },
-
-  // 〆：最初の「やめろ！」に繋がるように置く（演出）
-  { speaker:"熱史", speakerId:"atsushi",
-    text:"やめろ！",
-    tone:"shout", fx:"shake", speed: 16
-  },
 ];
+
 
 
 
@@ -183,6 +166,7 @@ if (fade) {
   requestAnimationFrame(() => fade.classList.add("out"));
   fade.addEventListener("transitionend", () => fade.remove(), { once: true });
 }
+
 
 
 
