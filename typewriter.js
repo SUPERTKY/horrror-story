@@ -2,9 +2,15 @@
 export function createDialogueSystem({
   dialogEl,
   speakerEl,
-  textEl,        // ★コンテナ (#text)
+  textEl,
   charElsById,
   speed = 22,
+
+  // ★追加
+  bgmEl = null,
+  sfxEl = null,
+  overlayEl = null,
+  overlayImgEl = null,
 }) {
   let lines = [];
   let index = 0;
@@ -14,14 +20,14 @@ export function createDialogueSystem({
 
   const appeared = new Set();
 
-  // ★2段対応：中の要素を拾う（無ければフォールバック）
   const textAEl = textEl?.querySelector?.("#textA") ?? textEl;
   const textBEl = textEl?.querySelector?.("#textB") ?? null;
+
+  function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
 
   function setActiveSpeakers(speakerIds){
     const ids = (Array.isArray(speakerIds) ? speakerIds : [speakerIds]).filter(Boolean);
 
-    // 立ち絵が存在するidだけ出す
     ids.forEach(id => {
       if (charElsById[id]) {
         appeared.add(id);
@@ -37,8 +43,6 @@ export function createDialogueSystem({
         el.classList.remove("active");
         return;
       }
-
-      // ★同時発話なら2人ともactive
       el.classList.toggle("active", ids.includes(id));
     });
   }
@@ -53,7 +57,70 @@ export function createDialogueSystem({
     if (line.fx) dialogEl.classList.add(`fx-${line.fx}`);
   }
 
-  function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+  // ===== ★効果：BGMを一瞬止めて、別音を鳴らす（終わったらBGM復帰）=====
+  async function playInterruptAudio(src, { volume = 1.0 } = {}) {
+    if (!src) return;
+    if (!bgmEl) return;
+
+    const wasPlaying = !bgmEl.paused;
+    const prevVol = bgmEl.volume;
+
+    // BGMを一時停止（または極小にするなら bgmEl.volume = 0.05 でもOK）
+    if (wasPlaying) bgmEl.pause();
+
+    const a = new Audio(src);
+    a.volume = volume;
+
+    try {
+      await a.play();
+      await new Promise(res => a.addEventListener("ended", res, { once:true }));
+    } catch {
+      // autoplay制限等で失敗しても無視
+    }
+
+    // BGM復帰
+    bgmEl.volume = prevVol;
+    if (wasPlaying) {
+      bgmEl.play().catch(()=>{});
+    }
+  }
+
+  // ===== ★効果：効果音（BGMは止めない）=====
+  function playSfx(src, { volume = 1.0 } = {}) {
+    if (!src || !sfxEl) return;
+    sfxEl.pause();
+    sfxEl.currentTime = 0;
+    sfxEl.src = src;
+    sfxEl.volume = volume;
+    sfxEl.play().catch(()=>{});
+  }
+
+  // ===== ★効果：中央画像の表示（一定時間 or 手動で消す）=====
+  async function showOverlayImage(src, { ms = 800 } = {}) {
+    if (!src || !overlayEl || !overlayImgEl) return;
+
+    overlayImgEl.src = src;
+    overlayEl.classList.add("show");
+
+    if (ms > 0) {
+      await sleep(ms);
+      overlayEl.classList.remove("show");
+    }
+  }
+
+  // ★ここで「セリフ開始時に発動する効果」をまとめて実行
+  async function runLineEffects(line){
+    if (!line) return;
+
+    // 例：line.sfx = { src:"assets/sfx_click.mp3", volume:0.8 }
+    if (line.sfx?.src) playSfx(line.sfx.src, line.sfx);
+
+    // 例：line.cut = { src:"assets/stinger.mp3", volume:0.9 } // BGM中断して鳴る
+    if (line.cut?.src) await playInterruptAudio(line.cut.src, line.cut);
+
+    // 例：line.image = { src:"assets/mark.png", ms:900 }
+    if (line.image?.src) await showOverlayImage(line.image.src, line.image);
+  }
 
   async function typeTextWithCommands(targetEl, rawText, baseDelay){
     if (!targetEl) return;
@@ -93,35 +160,31 @@ export function createDialogueSystem({
 
     applyLineStyle(line);
 
-    // ★2人同時発話 or 1人発話 判定
+    // ★追加：セリフ開始時の効果
+    await runLineEffects(line);
+
     const isDual = Array.isArray(line.speakers) && Array.isArray(line.texts);
 
     if (isDual) {
       const a = line.speakers[0] ?? {};
       const b = line.speakers[1] ?? {};
 
-      // 表示名：2人まとめて
       speakerEl.textContent = `${a.speaker ?? "—"}＆${b.speaker ?? "—"}`;
-
-      // 立ち絵：2人分active（ゲストはspeakerId nullでOK）
       setActiveSpeakers([a.speakerId, b.speakerId]);
 
       const lineSpeed = line.speed ?? speed;
-
-      // ★同時にタイプ（Promise.all）
       await Promise.all([
         typeTextWithCommands(textAEl, line.texts[0] ?? "", lineSpeed),
         typeTextWithCommands(textBEl, line.texts[1] ?? "", lineSpeed),
       ]);
 
     } else {
-      // 1人発話（従来互換）
       speakerEl.textContent = line.speaker ?? "—";
       setActiveSpeakers(line.speakerId ?? null);
 
       const lineSpeed = line.speed ?? speed;
       await typeTextWithCommands(textAEl, line.text ?? "", lineSpeed);
-      if (textBEl) textBEl.textContent = ""; // ★2段目は消す
+      if (textBEl) textBEl.textContent = "";
     }
 
     typing = false;
