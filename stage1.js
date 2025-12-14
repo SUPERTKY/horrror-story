@@ -4,6 +4,12 @@ import { createDialogueSystem } from "./typewriter.js";
 // stage1.js（STAGE1_DIALOGUEだけ差し替え）
 // stage1.js
 const STAGE1_DIALOGUE = [
+    {
+    speaker: "ガイド",
+    speakerId: null, // ← 立ち絵なし
+    text: "熱史、秋介に花子(ふぁなこ)は、中学生の仲良し3人組。\nおや？なにか話しているようです。",
+    tone: "cold"
+  },
   { speaker:"熱史", speakerId:"atsushi",
     text:"俺、ミュージシャンになりたいんだ。",
     tone:"cold"
@@ -185,6 +191,7 @@ if (fade) {
   requestAnimationFrame(() => fade.classList.add("out"));
   fade.addEventListener("transitionend", () => fade.remove(), { once: true });
 }
+
 
 
 
