@@ -96,17 +96,27 @@ export function createDialogueSystem({
   }
 
   // ===== ★効果：中央画像の表示（一定時間 or 手動で消す）=====
-  async function showOverlayImage(src, { ms = 800 } = {}) {
-    if (!src || !overlayEl || !overlayImgEl) return;
+async function showOverlayImage(src, { persist = false, ms = 800 } = {}) {
+  if (!src || !overlayEl || !overlayImgEl) return;
 
-    overlayImgEl.src = src;
-    overlayEl.classList.add("show");
+  overlayImgEl.src = src;
+  overlayEl.classList.add("show");
 
-    if (ms > 0) {
-      await sleep(ms);
-      overlayEl.classList.remove("show");
-    }
+  // ★出しっぱなし
+  if (persist) return;
+
+  // 従来：時間で消す
+  if (ms > 0) {
+    await sleep(ms);
+    overlayEl.classList.remove("show");
   }
+}
+function hideOverlay(){
+  if (!overlayEl || !overlayImgEl) return;
+  overlayEl.classList.remove("show");
+  overlayImgEl.src = "";
+}
+
 
   // ★ここで「セリフ開始時に発動する効果」をまとめて実行
 async function runLineEffects(line){
@@ -202,16 +212,21 @@ async function typeLine(line){
   }
 
   async function next(){
-    if (!lines.length) return;
-    if (typing) { cancel = true; return; }
+  if (!lines.length) return;
 
-    index++;
-    if (index >= lines.length) {
-      index = lines.length - 1;
-      return;
-    }
-    await showCurrent();
+  if (typing) { cancel = true; return; }
+
+  // ★次の会話に進む瞬間に消す
+  hideOverlay();
+
+  index++;
+  if (index >= lines.length) {
+    index = lines.length - 1;
+    return;
   }
+  await showCurrent();
+}
+
 
   function load(newLines){
     lines = newLines;
@@ -220,4 +235,5 @@ async function typeLine(line){
 
   return { load, showCurrent, next };
 }
+
 
