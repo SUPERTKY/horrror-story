@@ -57,10 +57,22 @@ const STAGE1_DIALOGUE = [
     tone:"whisper", fx:"glitch"
   },
 
-  { speaker:"熱史", speakerId:"atsushi",
-    text:"そこで、彼が亡くなっていた森に行って、アドバイスをもらおうと思う。",
-    tone:"cold"
+{ speaker:"熱史", speakerId:"atsushi",
+  text:"3カ月前に亡くなった天才ミュージシャン！\n田中たけしさんだ！",
+  tone:"shout",
+  fx:"shake",
+  speed:16,
+
+  // ★追加効果（音だけ）
+  cut:{ src:"assets/bikkuri.mp3", volume:0.9 }
+},
+
+
+  // ★追加効果
+  image:{ src:"assets/mori.png", ms:1200 },
+  cut:{ src:"assets/bikkuri.mp3", volume:0.9 }
   },
+
 
   // ★ 同時しゃべり（脱力）
   {
@@ -178,6 +190,7 @@ if (fade) {
   requestAnimationFrame(() => fade.classList.add("out"));
   fade.addEventListener("transitionend", () => fade.remove(), { once: true });
 }
+
 
 
 
