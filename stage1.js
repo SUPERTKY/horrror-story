@@ -29,10 +29,14 @@ const STAGE1_DIALOGUE = [
     tone:"whisper"
   },
 
-  { speaker:"熱史", speakerId:"atsushi",
-    text:"3カ月前に亡くなった天才ミュージシャン！\n田中たけしさんだ！",
-    tone:"shout", fx:"shake", speed:16
-  },
+{ speaker:"熱史", speakerId:"atsushi",
+  text:"3カ月前に亡くなった天才ミュージシャン！\n田中たけしさんだ！",
+  tone:"shout",
+  fx:"shake",
+  speed:16,            // ← ここにもカンマ
+  cut:{ src:"assets/bikkuri.mp3", volume:0.9 }
+},
+
 
   // ★ 同時しゃべり
   {
@@ -58,21 +62,11 @@ const STAGE1_DIALOGUE = [
   },
 
 { speaker:"熱史", speakerId:"atsushi",
-  text:"3カ月前に亡くなった天才ミュージシャン！\n田中たけしさんだ！",
-  tone:"shout",
-  fx:"shake",
-  speed:16,
-
-  // ★追加効果（音だけ）
-  cut:{ src:"assets/bikkuri.mp3", volume:0.9 }
-},
-
-
-  // ★追加効果
+  text:"そこで、彼が亡くなっていた森に行って、アドバイスもらおうと思う。",
+  tone:"cold",         // ← ★ここにカンマ
   image:{ src:"assets/mori.png", ms:1200 },
   cut:{ src:"assets/bikkuri.mp3", volume:0.9 }
-  },
-
+},
 
   // ★ 同時しゃべり（脱力）
   {
@@ -81,8 +75,8 @@ const STAGE1_DIALOGUE = [
       { speaker:"ふぁなこ", speakerId:"fanako" }
     ],
     texts: [
-      "あぁ…",
-      "あぁ…"
+      "は？",
+      "は？"
     ],
     tone:"whisper"
   },
@@ -99,8 +93,8 @@ const STAGE1_DIALOGUE = [
       { speaker:"ふぁなこ", speakerId:"fanako" }
     ],
     texts: [
-      "あぁ……は！？",
-      "あぁ……は！？"
+      "は！？",
+      "は！？"
     ],
     tone:"shout", fx:"shake"
   },
@@ -123,6 +117,7 @@ const STAGE1_DIALOGUE = [
     tone:"shout"
   },
 ];
+
 
 
 
@@ -190,6 +185,7 @@ if (fade) {
   requestAnimationFrame(() => fade.classList.add("out"));
   fade.addEventListener("transitionend", () => fade.remove(), { once: true });
 }
+
 
 
 
