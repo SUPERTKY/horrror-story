@@ -64,7 +64,8 @@ const STAGE1_DIALOGUE = [
 { speaker:"熱史", speakerId:"atsushi",
   text:"そこで、彼が亡くなっていた森に行って、アドバイスもらおうと思う。",
   tone:"cold",         // ← ★ここにカンマ
-  image:{ src:"assets/mori.png", ms:1200 },
+  image:{ src:"assets/mori.png", persist:true },
+
   cut:{ src:"assets/bikkuri.mp3", volume:0.9 }
 },
 
@@ -184,6 +185,7 @@ if (fade) {
   requestAnimationFrame(() => fade.classList.add("out"));
   fade.addEventListener("transitionend", () => fade.remove(), { once: true });
 }
+
 
 
 
