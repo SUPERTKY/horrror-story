@@ -57,13 +57,21 @@
 
 
     /* 会話ボックス */
-    .dialog{
-      position:absolute; left:0; right:0; bottom:0;
-      background: var(--panel);
-      border-top: 1px solid var(--line);
-      padding: 12px 14px 14px;
-      min-height: 120px;
-    }
+.dialog{
+  position:absolute; left:0; right:0; bottom:0;
+  background: var(--panel);
+  border-top: 1px solid var(--line);
+
+  padding: 8px 12px 10px;   /* 小さく */
+  min-height: 86px;         /* 小さく */
+}
+
+.text{
+  line-height:1.7;          /* 少し詰める */
+  min-height: 2.9em;        /* 小さく */
+  font-size: 0.98rem;       /* 好みで */
+}
+
     .toprow{
       display:flex; align-items:center; justify-content:space-between; gap:10px;
       margin-bottom: 8px;
@@ -71,12 +79,6 @@
     .speaker{ font-weight:700; letter-spacing:.06em; }
     .hint{ font-size:.85rem; opacity:.75; }
 
-    .text{
-      line-height:1.85;
-      white-space: pre-wrap;
-      min-height: 3.6em;
-      user-select:none;
-    }
 
     .controls{
       margin-top: 10px;
@@ -143,6 +145,23 @@
     0 0 10px rgba(255,255,255,.12);
 }
 .textLine { min-height: 1.8em; white-space: pre-wrap; }
+.overlay{
+  position:absolute; inset:0;
+  display:none;
+  align-items:center; justify-content:center;
+  background: rgba(0,0,0,.35);
+  z-index: 5;
+  pointer-events:none;
+}
+.overlay.show{ display:flex; }
+
+.overlayImg{
+  max-width: min(86vw, 520px);
+  max-height: min(58vh, 420px);
+  object-fit: contain;
+  filter: drop-shadow(0 14px 30px rgba(0,0,0,.55));
+  transform: translateY(-6px);
+}
 
   </style>
 </head>
@@ -181,6 +200,13 @@
       
 
     </section>
+<!-- 中央に出す画像（必要な時だけ表示） -->
+<div id="overlay" class="overlay" aria-hidden="true">
+  <img id="overlayImg" class="overlayImg" alt="">
+</div>
+
+<!-- 効果音用（セリフごとに差し替えて鳴らす） -->
+<audio id="sfx"></audio>
 
     <!-- 画面タップで進める -->
     <div id="tapLayer" class="tapLayer" aria-hidden="true"></div>
@@ -190,6 +216,7 @@
   <script type="module" src="stage1.js"></script>
 </body>
 </html>
+
 
 
 
